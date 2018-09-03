@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello cart</title>
+    <script defer src="/fontawesome/js/fontawesome-all.js"></script>
+    <style>
+    </style>
+  </head>
+  <body>
+    <nav class="nav-wrapper">
+        <label class='label' for="menu-trigger">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+        </label>
+        <input type="checkbox" id="menu-trigger" /> 
+        <div class="row">    		            
+            <ul id="nav" class="nav mainmenu">
+                <li class="current"><a href="index.html">Home</a></li>
+                <li class="has-children"><a href="products.html">Catalog</a></li>
+                <li><a href="about.html">About</a></li>	
+                <li class="has-children"><a href="blog.html">Blog</a></li>	
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="#" id="cart-trigger"><i class="fas fa-shopping-cart"></i>&nbsp;Cart</a></li>
+            </ul> <!-- end nav -->			   	 
+        </div> 
+    </nav> <!-- end nav-wrap --> 	 
+    <section class="wrapper container special" id="featured">
+      <article class="page">
+          <h2 id="id1">Window sizes and scrolling</h2>
+          <div id="nod1">
+            How to find out the width of the browser window? How to get the full height of the document, including the scrolled out part? How to scroll the page using JavaScript?
+            From the DOM point of view, the root document element is document.documentElement. That element corresponds to html and has geometry properties described in the previous chapter. For some cases we can use it, but there are additional methods and peculiarities important enough to consider.
+          </div>
+          <h2>Width/height of the window</h2>
+          
+            <div class="">Properties clientWidth/clientHeight of document.documentElement is exactly what we want here:
+
+              For instance, this button shows the height of your window:
+              
+              Not window.innerWidth/Height
+              
+              Browsers also support properties window.innerWidth/innerHeight. They look like what we want. So what’s the difference?
+              
+              If there’s a scrollbar occupying some space, clientWidth/clientHeight provide the width/height inside it. 
+              
+              In other words, they return width/height of the visible part of the document, available for the content.
+              
+              And window.innerWidth/innerHeight ignore the scrollbar.
+              
+              If there’s a scrollbar, and it occupies some space, then these two lines show different values:
+              
+              alert( window.innerWidth ); // full window width
+              
+              alert( document.documentElement.clientWidth ); // window width minus the scrollbar
+              
+              In most cases we need the available window width: to draw or position something. That is: inside scrollbars if there are any. So we should use documentElement.clientHeight/Width.
+
+              DOCTYPE is important
+
+              Please note: top-level geometry properties may work a little bit differently when there’s no DOCTYPE HTML in HTML. Odd things are possible.
+
+              In modern HTML we should always write DOCTYPE. Generally that’s not a JavaScript question, but here it affects JavaScript as well.
+            </div>
+      </article>  
+
+      <article class="page">
+        <h2>Width/height of the document</h2>
+        <div>
+              Theoretically, as the root document element is documentElement.clientWidth/Height, and it encloses all the content, we could measure its full size as documentElement.scrollWidth/scrollHeight.
+
+              These properties work well for regular elements. But for the whole page these properties do not work as intended. In Chrome/Safari/Opera if there’s no scroll, then documentElement.scrollHeight may be even less than documentElement.clientHeight! For regular elements that’s a nonsense.
+              
+              To have a reliable full window size, we should take the maximum of these properties:
+              
+              let scrollHeight = Math.max(
+                document.body.scrollHeight, document.documentElement.scrollHeight,
+                document.body.offsetHeight, document.documentElement.offsetHeight,
+                document.body.clientHeight, document.documentElement.clientHeight
+              );
+              
+              alert('Full document height, with scrolled out part: ' + scrollHeight);
+              
+              Why so? Better don’t ask. These inconsistencies come from ancient times, not a “smart” logic.
+              
+        </div>
+      </article>  
+      <article class="page">
+        <h2>Get the current scroll</h2>
+        <div class="">Regular elements have their current scroll state in elem.scrollLeft/scrollTop.
+
+        What’s with the page? Most browsers provide documentElement.scrollLeft/Top for the document scroll, but Chrome/Safari/Opera have bugs (like 157855, 106133) and we should use document.body instead of document.documentElement there.
+                
+        Luckily, we don’t have to remember these peculiarities at all, because of the special properties window.pageXOffset/pageYOffset:
+                
+        alert('Current scroll from the top: ' + window.pageYOffset);
+        alert('Current scroll from the left: ' + window.pageXOffset);
+                
+        These properties are read-only.
+        </div>
+      </article>
+
+      <article class="page">
+          <h2>Scrolling</h2>
+          <div class="">
+          Scrolling: scrollTo, scrollBy, scrollIntoView
+          Important:
+                  
+          To scroll the page from JavaScript, its DOM must be fully built.
+                  
+          For instance, if we try to scroll the page from the script in head, it won’t work.
+                  
+          Regular elements can be scrolled by changing scrollTop/scrollLeft.
+                  
+          We can do the same for the page:
+                  
+          For all browsers except Chrome/Safari/Opera: modify document.documentElement.scrollTop/Left.
+          In Chrome/Safari/Opera: use document.body.scrollTop/Left instead.
+                  
+          It should work, but smells like cross-browser incompatibilities. Not good. Fortunately, there’s a simpler, more universal solution: special methods window.scrollBy(x,y) and window.scrollTo(pageX,pageY).
+                  
+          The method scrollBy(x,y) scrolls the page relative to its current position. For instance, scrollBy(0,10) scrolls the page 10px down.
+                  
+          The button below demonstrates this:
+                  
+          The method scrollTo(pageX,pageY) scrolls the page relative to the document top-left corner. It’s like setting scrollLeft/scrollTop.
+                  
+          To scroll to the very beginning, we can use scrollTo(0,0).
+                  
+          These methods work for all browsers the same way.
+          scrollIntoView
+                  
+          For completeness, let’s cover one more method: elem.scrollIntoView(top).
+                  
+          The call to elem.scrollIntoView(top) scrolls the page to make elem visible. It has one argument:
+                  
+          if top=true (that’s the default), then the page will be scrolled to make elem appear on the top of the window. The upper edge of the element is aligned with the window top.
+          if top=false, then the page scrolls to make elem appear at the bottom. The bottom edge of the element is aligned with the window bottom.
+                  
+          The button below scrolls the page to make itself show at the window top:
+                  
+          And this button scrolls the page to show it at the bottom:
+                  
+          Forbid the scrolling
+                  
+          Sometimes we need to make the document “unscrollable”. For instance, when we need to cover it with a large message requiring immediate attention, and we want the visitor to interact with that message, not with the document.
+                  
+          To make the document unscrollable, its enough to set document.body.style.overflow = "hidden". The page will freeze on its current scroll.
+                  
+          Try it:
+                  
+          The first button freezes the scroll, the second one resumes it.
+                  
+          We can use the same technique to “freeze” the scroll for other elements, not just for document.body.
+                  
+          The drawback of the method is that the scrollbar disappears. If it occupied some space, then that space is now free, and the content “jumps” to fill it.
+                  
+          That looks a bit odd, but can be worked around if we compare clientWidth before and after the freeze, and if it increased (the scrollbar disappeared) then add padding to document.body in place of the scrollbar, to keep the content width same.
+          </div>
+        </article>
+      <div class="grid-layout">
+      </div>            
+    </section>
+    <!-- Footer Area Start -->
+    <footer id="footer">
+    </footer>
+    <!-- Footer Area Stop -->
+    <div id="shadow-layer" class="shadow-layer"></div>
+    <!-- Aside Area Start -->
+    <aside id="cart-sidebar" class="cart">
+        <a href="" class="remove"><i class="fas fa-times fa-2x"></i></a>
+        
+        <h2>Cart</h2>
+        <!-- cart-items start-->
+        <ul class="cart-items">
+           
+        </ul> 
+        <!-- cart-items end -->
+    
+        <div class="cart-total">
+            <p>Total <span>$00.00</span></p>
+        </div> <!-- cart-total -->
+    
+        <a href="#" class="checkout-button">Checkout</a>
+    </aside> <!-- cart end -->
+    <!-- Aside Area end -->
+    <div class="mega-menu">
+        <div class="mega-menu-top">
+            <div class="mega-search">
+                <label for="mega-search">Search</label>
+                <input type="search" id="mega-search" placeholder="Search" />
+            </div>
+            <div class="close">
+                <span>&#10006;</span> 
+            </div>
+        </div>
+        <h3>Catalog</h3>
+        <ul class="nav themes">
+            <li><a href="#"> Mice</a></li>
+            <li><a href="#"> Cats</a></li>
+            <li><a href="#"> Dogs</a></li>
+            <li><a href="#"> Rabbits</a></li>
+            <li><a href="#"> Crocodiles</a></li>
+            <li><a href="#"> Chicks</a></li>
+            <li><a href="#"> Dinosaurs</a></li>
+            <li><a href="#"> Skunks</a></li>
+            <li><a href="#"> Rats</a></li>
+            <li><a href="#"> Crows</a></li>
+        </ul>
+        <footer>
+            <div class="logo-footer">  
+              <img src="images/logo.png">
+            </div>
+            <ul class="nav footer">
+                <li>Contact Us</li>
+                <li>About Us</li>
+                <li>Privacy Policy</li>
+            </ul>
+        </footer>
+    </div>
+    <template id="cartItem">
+      <li>
+        <span class="productInCart"></span>
+          <span class="qty">
+            <span class="item-quantities">
+            </span>
+          </span>
+          <span class="item-name">
+          </span>
+          <span class="item-prices">
+          </span>
+          <a class="item-remove" href="#0"><i class="fas fa-times"></i></a>
+      </li>
+    </template>
+    <template id="productItem">
+      <article class="grid-item">
+        <div class="product-wrapper">    
+          <div class="product">
+            <p class="product-name">Very&nbsp;Big&nbsp;Cat</p>
+            <div class="icon">
+              <div class="icon-background"></div>
+                <span class="shopping-cart">
+                  <i class="fas fa-shopping-cart fa-2x"></i>
+                </span>
+            </div>
+            <div class="product_picture">
+                <img src="" alt="Nice Cat" class="product-picture" />
+            </div>
+            <span class="product-description"></span>
+            <div class="product-menu product-id"  productId=''>
+              <div class="product-price">
+                9.99
+              </div>
+              <div class="buy-now">
+                Buy now!
+              </div>
+              <div class="product-detail">
+                Detail
+              </div>
+              
+              <div class="how-many">
+                <div class="quantity-input">
+                  <input class="minus btn" type="button" value="-">
+                  <input class="input-text quantity text" value="3" size="4">
+                  <input class="plus btn" type="button" value="+">
+                </div>
+              </div>
+              <div class="cancel">
+                Cancel
+              </div>
+              <div class="add-to-cart">
+                Add to Cart!
+              </div>
+            </div>
+          </div>
+          <div class="product-back">
+            <span class="check">
+              <i class="fas fa-check fa-4x"></i>
+              <p>Success!</p>
+            </span>
+          </div>   
+        </div> 
+      </article> 
+    </template>
+  </body>
+</html>
